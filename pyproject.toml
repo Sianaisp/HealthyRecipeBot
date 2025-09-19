@@ -1,0 +1,26 @@
+[project]
+name = "Healthy-Recipe-Agent"
+version = "0.1.0"
+description = "An agent that will help generate recipes taking into account food restrictions and food availability."
+authors = [
+    {name = "sianaisp",email = "anais.plancoulaine@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13,<3.15"
+dependencies = [
+    "streamlit (>=1.49.1,<2.0.0)",
+    "langchain (>=0.3.27,<0.4.0)",
+    "langgraph (>=0.6.6,<0.7.0)",
+    "faiss-cpu (>=1.12.0,<2.0.0)",
+    "langchain-openai (>=0.3.32,<0.4.0)",
+    "langchain-community (>=0.3.29,<0.4.0)",
+    "requests (>=2.32.5,<3.0.0)",
+    "pypdf (>=6.0.0,<7.0.0)",
+    "python-dotenv (>=1.1.1,<2.0.0)",
+    "pydantic (>=2.11.9,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,69 @@
+{
+  "715415": {
+    "id": 715415,
+    "name": "Red Lentil Soup with Chicken and Turnips",
+    "ingredients": [
+      "additional toppings: avocado",
+      "carrots",
+      "celery stalks",
+      "chicken breast",
+      "flat leaf parsley",
+      "garlic",
+      "olive oil",
+      "canned tomatoes",
+      "lentils",
+      "salt and pepper",
+      "turnip",
+      "vegetable stock",
+      "onion"
+    ],
+    "calories": null,
+    "sourceUrl": "https://www.pinkwhen.com/red-lentil-soup-with-chicken-and-turnips/"
+  },
+  "715446": {
+    "id": 715446,
+    "name": "Slow Cooker Beef Stew",
+    "ingredients": [
+      "beef broth",
+      "carrots",
+      "celery",
+      "cream of mushroom soup",
+      "green onions",
+      "new potatoes",
+      "onion",
+      "dale's seasoning",
+      "stew meat",
+      "water"
+    ],
+    "calories": null,
+    "sourceUrl": "https://www.pinkwhen.com/slow-cooker-beef-stew-recipe/"
+  },
+  "782601": {
+    "id": 782601,
+    "name": "Red Kidney Bean Jambalaya",
+    "ingredients": [
+      "brown rice",
+      "carrots",
+      "celery",
+      "celery seed",
+      "kidney beans",
+      "marjoram",
+      "thyme",
+      "eggplant",
+      "garlic",
+      "green beans",
+      "ground pepper",
+      "ground sage",
+      "liquid smoke",
+      "olive oil",
+      "bell pepper",
+      "onion",
+      "sea salt",
+      "sriracha",
+      "tomatoes",
+      "vegetable stock"
+    ],
+    "calories": null,
+    "sourceUrl": "https://www.foodandspice.com/2016/05/red-kidney-bean-jambalaya.html"
+  }
+}
