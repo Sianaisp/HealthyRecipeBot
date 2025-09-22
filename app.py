@@ -1,12 +1,6 @@
 import streamlit as st
-from dotenv import load_dotenv
-import os
+import re
 from graph import build_graph
-
-# Load environment variables
-load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
 
 def main():
     st.set_page_config(page_title="Healthy Recipe Copilot", page_icon="🥗")
@@ -16,6 +10,7 @@ def main():
     # --- User Inputs ---
     query = st.text_input("What are you looking for?")
     allergies_text = st.text_input("Food allergies (comma-separated, optional)")
+    
     diet_options = ["None", "Vegetarian", "Vegan", "Pescatarian", "Gluten-Free", "Lactose-Free"]
     diet_choice = st.selectbox("Diet Preference", diet_options)
 
@@ -61,13 +56,28 @@ def main():
                 if r.get("image"):
                     st.image(r["image"], width=300)
 
+                # Description
                 if r.get("description"):
                     st.write(r["description"])
 
+                # Calories
+                if r.get("calories"):
+                    st.write(f"**Calories:** {r['calories']} kcal")
+
+                # Ingredients
                 if r.get("ingredients"):
                     st.write("**Ingredients:**")
                     for ing in r["ingredients"]:
                         st.write(f"- {ing}")
+
+                # Instructions
+                if r.get("instructions"):
+                    st.write("**Instructions:**")
+                    # Split instructions into steps for readability
+                    steps = re.split(r"\s*\d+\.\s*", r["instructions"])
+                    for step in steps:
+                        if step.strip():
+                            st.write(f"- {step.strip()}")
 
                 st.divider()
 
