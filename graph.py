@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 import json
 from pydantic import BaseModel
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI 
 from langgraph.graph import StateGraph, START, END
 from agent_tools import search_recipes_spoonacular, filter_allergies, filter_diet
 from pdf_rag import query_pdf_structured
@@ -10,7 +10,7 @@ from pdf_rag import query_pdf_structured
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-llm = ChatOpenAI(model_name="gpt-4", temperature=0, openai_api_key=OPENAI_API_KEY)
+llm = ChatOpenAI(model="gpt-4", temperature=0, api_key=OPENAI_API_KEY)
 
 # -------------------------
 # State model
@@ -23,6 +23,7 @@ class RecipeState(BaseModel):
     ingredients: list[str] = []
     allergies: list[str] = []
     results: list[dict] = []
+
 
 # -------------------------
 # Nodes
@@ -58,7 +59,8 @@ Respond in JSON like:
         diet = parsed.get("diet")
         if intent not in ["ingredients", "profile"]:
             intent = "profile"
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ classify_intent failed: {e}")
         intent = "profile"
         meal_type = None
         diet = None
@@ -70,6 +72,7 @@ Respond in JSON like:
     if not state.diet:
         state.diet = diet
 
+    print(f"🧭 Classified intent='{state.intent}', meal_type='{state.meal_type}', diet='{state.diet}'")
     return state
 
 
@@ -78,8 +81,9 @@ def ingredients_flow(state: RecipeState) -> RecipeState:
     Search recipes by ingredients via Spoonacular API,
     apply diet/allergy filters, and include structured PDF recipes.
     """
+    print(f"🥕 Entering ingredients_flow with query='{state.query}'")
 
-    # --- Spoonacular search ---
+    # Spoonacular search
     results = search_recipes_spoonacular(
         ingredients=[state.query],
         meal_type=state.meal_type,
@@ -87,26 +91,29 @@ def ingredients_flow(state: RecipeState) -> RecipeState:
         number=5
     )
 
-    print(f"DEBUG received diet={state.diet}, allergies={state.allergies}")
+    print(f"🔍 Found {len(results)} Spoonacular results before filtering. Diet={state.diet}, Allergies={state.allergies}")
 
-    # --- Filter by allergies ---
+    # Filter by allergies 
     if state.allergies:
         results = filter_allergies(results, state.allergies)
+        print(f"🚫 After allergy filter: {len(results)} recipes remain")
 
-    # --- Filter by diet ---
+    # Filter by diet 
     if state.diet:
-        print(f"DEBUG calling filter_diet with diet={state.diet}")
+        print(f"🥗 Applying diet filter: {state.diet}")
         results = filter_diet(results, state.diet)
+        print(f"✅ After diet filter: {len(results)} recipes remain")
 
-    # --- Tag Spoonacular results ---
+    # Tag Spoonacular results 
     for r in results:
         r["source"] = "Spoonacular"
         r["sourceUrl"] = r.get("sourceUrl")
         r["image"] = r.get("image", None)
 
-    # --- Add PDF results ---
+    # Add PDF results 
     parsed = query_pdf_structured(state.query)
     if parsed:
+        print(f"📖 Adding {len(parsed)} PDF recipes")
         pdf_recipes = parsed if isinstance(parsed, list) else [parsed]
         for r in pdf_recipes:
             # Filter PDF by diet if needed
@@ -120,6 +127,7 @@ def ingredients_flow(state: RecipeState) -> RecipeState:
             results.append(r)
 
     state.results = results
+    print(f"🏁 ingredients_flow finished with {len(state.results)} recipes")
     return state
 
 
@@ -128,8 +136,9 @@ def profile_flow(state: RecipeState) -> RecipeState:
     Search recipes based on general profile queries,
     apply diet/allergy filters, and include structured PDF recipes.
     """
+    print(f"🍽️ Entering profile_flow with query='{state.query}'")
 
-    # --- Spoonacular search ---
+    # Spoonacular search 
     results = search_recipes_spoonacular(
         ingredients=[],
         meal_type=state.meal_type,
@@ -137,26 +146,29 @@ def profile_flow(state: RecipeState) -> RecipeState:
         number=5
     )
 
-    print(f"DEBUG received diet={state.diet}, allergies={state.allergies}")
+    print(f"🔍 Found {len(results)} Spoonacular results before filtering. Diet={state.diet}, Allergies={state.allergies}")
 
-    # --- Filter by allergies ---
+    # Filter by allergies 
     if state.allergies:
         results = filter_allergies(results, state.allergies)
+        print(f"🚫 After allergy filter: {len(results)} recipes remain")
 
-    # --- Filter by diet ---
+    # Filter by diet
     if state.diet:
-        print(f"DEBUG calling filter_diet with diet={state.diet}")
+        print(f"🥗 Applying diet filter: {state.diet}")
         results = filter_diet(results, state.diet)
+        print(f"✅ After diet filter: {len(results)} recipes remain")
 
-    # --- Tag Spoonacular results ---
+    # Tag Spoonacular results
     for r in results:
         r["source"] = "Spoonacular"
         r["sourceUrl"] = r.get("sourceUrl")
         r["image"] = r.get("image", None)
 
-    # --- Add PDF results ---
+    # Add PDF results 
     parsed = query_pdf_structured(state.query)
     if parsed:
+        print(f"📖 Adding {len(parsed)} PDF recipes")
         pdf_recipes = parsed if isinstance(parsed, list) else [parsed]
         for r in pdf_recipes:
             # Filter PDF by diet if needed
@@ -170,8 +182,8 @@ def profile_flow(state: RecipeState) -> RecipeState:
             results.append(r)
 
     state.results = results
+    print(f"🏁 profile_flow finished with {len(state.results)} recipes")
     return state
-
 
 
 # -------------------------
@@ -182,9 +194,10 @@ def route_by_intent(state: RecipeState):
     Route to the correct flow based on intent.
     PDF recipes are included automatically inside each flow.
     """
-    if state.intent == "ingredients":
-        return "ingredients_flow"
-    return "profile_flow"
+    next_node = "ingredients_flow" if state.intent == "ingredients" else "profile_flow"
+    print(f"🚦 Routing intent='{state.intent}' → {next_node}")
+    return next_node
+
 
 # -------------------------
 # Build graph
@@ -214,4 +227,5 @@ def build_graph():
     graph.add_edge("profile_flow", END)
     graph.add_edge("ingredients_flow", END)
 
+    print("⚡ Graph built and compiled.")
     return graph.compile()
