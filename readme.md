@@ -90,6 +90,15 @@ poetry install
 3. Create a `.env` file and set your OpenAI API key:
 ```env
 OPENAI_API_KEY=your_api_key_here
+RAPIDAPI_KEY=your_rapidapi_key_here
+
+How to get a RapidAPI key
+Go to RapidAPI.
+Sign up for a free account.
+Search for Spoonacular in the marketplace.
+Subscribe to the API (the free tier is enough for testing).
+Go to your Dashboard → Security → API Keys, and copy your key.
+Paste it into your .env file as RAPIDAPI_KEY.
 ```
 
 4. Place your cookbook PDF(s) in the `PDF/` folder.
@@ -105,5 +114,5 @@ poetry run streamlit run app.py
 
 - FAISS index is automatically built on first run.
 - Debug prints show full recipe text if enabled.
-- Recommended: install `watchdog` for faster file reloads in Streamlit.
+
 
