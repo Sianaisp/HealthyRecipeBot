@@ -12,6 +12,9 @@ The project uses:
 ---
 
 ## Features
+<img width="763" height="439" alt="Screenshot 2025-09-24 at 10 55 53" src="https://github.com/user-attachments/assets/134dc7d7-46e0-4482-8b6c-9eba54ba86bb" />
+
+
 - Query a PDF cookbook and retrieve structured recipe information.
 - Filters recipes based on:
   - Dietary preferences (vegetarian, vegan, etc.)
